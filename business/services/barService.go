@@ -6,12 +6,12 @@ type BarServicer interface {
 	AddBar(user entities.Bar) (entities.Bar, error)
 }
 
-type BarService struct{}
+type barService struct{}
 
 func NewBarService() BarServicer {
-	return BarService{}
+	return barService{}
 }
 
-func (barService BarService) AddBar(bar entities.Bar) (entities.Bar, error) {
+func (barService barService) AddBar(bar entities.Bar) (entities.Bar, error) {
 	return bar, nil
 }

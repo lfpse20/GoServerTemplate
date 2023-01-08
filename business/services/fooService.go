@@ -6,12 +6,12 @@ type FooServicer interface {
 	AddFoo(user entities.Foo) (entities.Foo, error)
 }
 
-type FooService struct{}
+type fooService struct{}
 
 func NewFooService() FooServicer {
-	return FooService{}
+	return fooService{}
 }
 
-func (fooService FooService) AddFoo(foo entities.Foo) (entities.Foo, error) {
+func (fooService fooService) AddFoo(foo entities.Foo) (entities.Foo, error) {
 	return foo, nil
 }

@@ -1,7 +1,11 @@
 package main
 
 import (
-	"GoServerTemplate/business/services"
+	"GoServerTemplate/api"
+	"GoServerTemplate/api/endpoints"
+	"GoServerTemplate/business"
+	"context"
+	transport "github.com/go-kit/kit/transport/http"
 	"log"
 	"net/http"
 
@@ -9,27 +13,32 @@ import (
 )
 
 func main() {
-	// todo services will get repos and gateways past in
-
-	_ = initServices() // todo inject service list in endpoints
+	services := business.InitServices()
+	eps := api.InitEndpoints(services)
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", helloWorldHandler())
+	setUpHandlers(r, eps)
+
 	log.Println("listening on port 8080")
+
 	http.ListenAndServe(":8080", r)
 }
 
-func helloWorldHandler() func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, World!"))
+func setUpHandlers(r *mux.Router, eps api.Endpoints) {
+	for _, definition := range endpoints.Definitions {
+		r.Methods(definition.Method).
+			Path(definition.Path).
+			Handler(
+				transport.NewServer(
+					api.MustGetEndpoint(eps, definition.EndpointName),
+					definition.Decoder,
+					encoder(),
+				))
 	}
 }
 
-func initServices() services.ServiceList {
-	serviceList := services.ServiceList{}
-
-	serviceList.FooService = services.NewFooService()
-	serviceList.BarService = services.NewBarService()
-
-	return serviceList
+func encoder() transport.EncodeResponseFunc {
+	return func(ctx context.Context, writer http.ResponseWriter, i interface{}) error {
+		return nil
+	}
 }
